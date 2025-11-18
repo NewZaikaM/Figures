@@ -1,6 +1,4 @@
 #include "rectangle.hpp"
-#include <stdexcept>
-#include <cmath>
 
 double Rectangle::computePerimeter(double a, double b) {
   if (a <= 0 || b <= 0)
@@ -22,4 +20,10 @@ double Rectangle::sideB() const {
 }
 double Rectangle::perimeter() const {
   return m_perimeter;
+}
+std::string Rectangle::to_string() const {
+  std::ostringstream out;
+  out << "Rectangle: " << m_a << " " << m_b;
+
+  return out.str();
 }

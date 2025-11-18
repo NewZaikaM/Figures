@@ -26,6 +26,9 @@ TEST_CASE( "Triangle with overflow perimeter", "[Triangle][Overflow]" ) {
 TEST_CASE( "Triangle correct perimeter", "[Triangle][Perimeter]" ) {
   REQUIRE( Triangle(3, 4, 5).perimeter() == (3 + 4 + 5));
 }
+TEST_CASE( "Triangle to_string format", "[Triangle][to_string]" ) {
+  REQUIRE( Triangle(3, 4, 5).to_string() == "Triangle: 3 4 5");
+}
 
 //Rectangle
 TEST_CASE( "Rectangle with negative sides", "[Rectangle][Negative_Sides]" ) {
@@ -39,6 +42,9 @@ TEST_CASE( "Rectangle with overflow perimeter", "[Rectangle][Overflow]" ) {
 TEST_CASE( "Rectangle correct perimeter", "[Rectangle][Perimeter]" ) {
   REQUIRE( Rectangle(3, 4).perimeter() == (3*2 + 4*2));
 }
+TEST_CASE( "Rectangle to_string format", "[Rectangle][to_string]" ) {
+  REQUIRE( Rectangle(3, 4).to_string() == "Rectangle: 3 4");
+}
 
 //Circle
 TEST_CASE( "Circle with negative sides", "[Circle][Negative_Sides]" ) {
@@ -50,4 +56,7 @@ TEST_CASE( "Circle with overflow perimeter", "[Circle][Overflow]" ) {
 }
 TEST_CASE( "Circle correct perimeter", "[Circle][Perimeter]" ) {
   REQUIRE( Circle(3).perimeter() == (2.0 * M_PI * 3));
+}
+TEST_CASE( "Circle to_string format", "[Circle][to_string]" ) {
+  REQUIRE( Circle(3).to_string() == "Circle: 3");
 }

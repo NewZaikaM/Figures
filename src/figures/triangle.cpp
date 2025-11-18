@@ -1,6 +1,4 @@
 #include "triangle.hpp"
-#include <stdexcept>
-#include <cmath>
 
 double Triangle::computePerimeter(double a, double b, double c) {
         if (a <= 0 || b <= 0 || c <= 0)
@@ -31,5 +29,11 @@ double Triangle::sideC() const {
 }
 double Triangle::perimeter() const {
   return m_perimeter;
+}
+std::string Triangle::to_string() const {
+  std::ostringstream out;
+  out << "Triangle: " << m_a << " " << m_b << " " << m_c;
+
+  return out.str();
 }
 
