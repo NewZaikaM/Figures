@@ -1,8 +1,6 @@
 #define _USE_MATH_DEFINES
 
 #include "circle.hpp"
-#include <stdexcept>
-#include <cmath>
 
 double Circle::computePerimeter(double r) {
   if (r <= 0)
@@ -24,9 +22,13 @@ double Circle::radius() const {
 double Circle::perimeter() const {
   return m_perimeter;
 }
+
 std::string Circle::to_string() const {
   std::ostringstream out;
   out << "Circle: " << m_r;
 
   return out.str();
+}
+Circle* Circle::clone() const {
+  return new Circle(*this);
 }

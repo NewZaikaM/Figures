@@ -17,6 +17,7 @@ class Rectangle : public IFigure, public StringConvertible {
     double perimeter() const override;
 
     std::string to_string() const override;
+    Rectangle* clone() const override;
 };
 
 #endif

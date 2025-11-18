@@ -8,6 +8,7 @@
 class IFigure {
 public:
   virtual double perimeter() const = 0;
+  virtual IFigure* clone() const = 0;
   virtual ~IFigure() = default;
 };
 

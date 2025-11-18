@@ -21,9 +21,13 @@ double Rectangle::sideB() const {
 double Rectangle::perimeter() const {
   return m_perimeter;
 }
+
 std::string Rectangle::to_string() const {
   std::ostringstream out;
   out << "Rectangle: " << m_a << " " << m_b;
 
   return out.str();
+}
+Rectangle* Rectangle::clone() const {
+  return new Rectangle(*this);
 }

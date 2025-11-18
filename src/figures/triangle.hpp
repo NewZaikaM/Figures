@@ -19,6 +19,7 @@ class Triangle : public IFigure, public StringConvertible {
     double perimeter() const override;
     
     std::string to_string() const override;
+    Triangle* clone() const override;
 };
 
 #endif
