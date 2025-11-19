@@ -3,7 +3,7 @@
 
 #include "figure.hpp"
 
-class Rectangle : public IFigure, public StringConvertible {
+class Rectangle : public Figure, public StringConvertible {
   const double m_a;
   const double m_b;
   const double m_perimeter;
@@ -16,7 +16,7 @@ class Rectangle : public IFigure, public StringConvertible {
     double sideB() const;
     double perimeter() const override;
 
-    std::string to_string() const override;
+    std::string toString() const override;
     Rectangle* clone() const override;
 };
 

@@ -3,7 +3,7 @@
 
 #include "figure.hpp"
 
-class Triangle : public IFigure, public StringConvertible {
+class Triangle : public Figure, public StringConvertible {
   const double m_a;
   const double m_b;
   const double m_c;
@@ -18,7 +18,7 @@ class Triangle : public IFigure, public StringConvertible {
     double sideC() const;
     double perimeter() const override;
     
-    std::string to_string() const override;
+    std::string toString() const override;
     Triangle* clone() const override;
 };
 

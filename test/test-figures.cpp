@@ -4,6 +4,7 @@
 #include "../src/figures/triangle.hpp"
 #include "../src/figures/rectangle.hpp"
 #include "../src/figures/circle.hpp"
+#include "../src/factories/factory.hpp"
 #include <stdexcept>
 #include <cmath>
 #include <limits>
@@ -27,7 +28,7 @@ TEST_CASE( "Triangle correct perimeter", "[triangle][perimeter]" ) {
   REQUIRE( Triangle(3, 4, 5).perimeter() == (3 + 4 + 5));
 }
 TEST_CASE( "Triangle to_string format", "[triangle][to_string]" ) {
-  REQUIRE( Triangle(3, 4, 5).to_string() == "Triangle: 3 4 5");
+  REQUIRE( Triangle(3, 4, 5).toString() == "Triangle 3 4 5");
 }
 
 //Rectangle
@@ -43,7 +44,7 @@ TEST_CASE( "Rectangle correct perimeter", "[rectangle][perimeter]" ) {
   REQUIRE( Rectangle(3, 4).perimeter() == (3*2 + 4*2));
 }
 TEST_CASE( "Rectangle to_string format", "[rectangle][to_string]" ) {
-  REQUIRE( Rectangle(3, 4).to_string() == "Rectangle: 3 4");
+  REQUIRE( Rectangle(3, 4).toString() == "Rectangle 3 4");
 }
 
 //Circle
@@ -58,49 +59,49 @@ TEST_CASE( "Circle correct perimeter", "[circle][perimeter]" ) {
   REQUIRE( Circle(3).perimeter() == (2.0 * M_PI * 3));
 }
 TEST_CASE( "Circle to_string format", "[circle][to_string]" ) {
-  REQUIRE( Circle(3).to_string() == "Circle: 3");
+  REQUIRE( Circle(3).toString() == "Circle 3");
 }
 
 //Prototype
 TEST_CASE("Clone id type", "[prototype][clone_id_type]") {
-  IFigure* org_triangle = new Triangle(3, 4, 5);
-  IFigure* copy_triangle = org_triangle->clone();
+  Figure* org_triangle = new Triangle(3, 4, 5);
+  Figure* copy_triangle = org_triangle->clone();
 
   REQUIRE( typeid(*org_triangle) == typeid(*copy_triangle));
   delete org_triangle; 
   delete copy_triangle;
   
-  IFigure* org_rectangle = new Rectangle(3, 4);
-  IFigure* copy_rectangle = org_rectangle->clone();
+  Figure* org_rectangle = new Rectangle(3, 4);
+  Figure* copy_rectangle = org_rectangle->clone();
 
   REQUIRE( typeid(*org_rectangle) == typeid(*copy_rectangle));
   delete org_rectangle; 
   delete copy_rectangle;
   
-  IFigure* org_circle = new Circle(3);
-  IFigure* copy_circle = org_circle->clone();
+  Figure* org_circle = new Circle(3);
+  Figure* copy_circle = org_circle->clone();
 
   REQUIRE( typeid(*org_circle) == typeid(*copy_circle));
   delete org_circle; 
   delete copy_circle;
 }  
 TEST_CASE("Clone diff reference", "[prototype][clone_diff_ref]") {
-  IFigure* org_triangle = new Triangle(3, 4, 5);
-  IFigure* copy_triangle = org_triangle->clone();
+  Figure* org_triangle = new Triangle(3, 4, 5);
+  Figure* copy_triangle = org_triangle->clone();
 
   REQUIRE( org_triangle != copy_triangle);
   delete org_triangle; 
   delete copy_triangle;
   
-  IFigure* org_rectangle = new Rectangle(3, 4);
-  IFigure* copy_rectangle = org_rectangle->clone();
+  Figure* org_rectangle = new Rectangle(3, 4);
+  Figure* copy_rectangle = org_rectangle->clone();
 
   REQUIRE( org_rectangle != copy_rectangle);
   delete org_rectangle; 
   delete copy_rectangle;
   
-  IFigure* org_circle = new Circle(3);
-  IFigure* copy_circle = org_circle->clone();
+  Figure* org_circle = new Circle(3);
+  Figure* copy_circle = org_circle->clone();
 
   REQUIRE( org_circle != copy_circle);
   delete org_circle; 
@@ -134,3 +135,23 @@ TEST_CASE("Clone data", "[prototype][clone_data]") {
   delete org_circle; 
   delete copy_circle;
 }  
+
+//Factory
+TEST_CASE( "Figure factory from empty string", "[factory][empty_string]" ) {
+  REQUIRE_THROWS_AS( FactoryFigure().create_from(""), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("    "), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("\n \n"), std::invalid_argument);
+}
+TEST_CASE( "Figure factory from too few parameters", "[factory][few_param]" ) {
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Triangle 3 4 "), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Rectangle 3 "), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Circle "), std::invalid_argument);
+}
+TEST_CASE( "Figure factory from non-numeric parameters", "[factory][non-num_param]" ) {
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Triangle 3 4 abc"), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Rectangle 3 abc"), std::invalid_argument);
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Circle abc"), std::invalid_argument);
+}
+TEST_CASE( "Figure factory from unknown name", "[factory][unknown_name]" ) {
+  REQUIRE_THROWS_AS( FactoryFigure().create_from("Test1 3 4 abc"), std::invalid_argument);
+}

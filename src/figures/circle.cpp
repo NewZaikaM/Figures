@@ -23,9 +23,9 @@ double Circle::perimeter() const {
   return m_perimeter;
 }
 
-std::string Circle::to_string() const {
+std::string Circle::toString() const {
   std::ostringstream out;
-  out << "Circle: " << m_r;
+  out << "Circle " << m_r;
 
   return out.str();
 }

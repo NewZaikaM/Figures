@@ -31,9 +31,9 @@ double Triangle::perimeter() const {
   return m_perimeter;
 }
 
-std::string Triangle::to_string() const {
+std::string Triangle::toString() const {
   std::ostringstream out;
-  out << "Triangle: " << m_a << " " << m_b << " " << m_c;
+  out << "Triangle " << m_a << " " << m_b << " " << m_c;
 
   return out.str();
 }

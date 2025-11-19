@@ -22,9 +22,9 @@ double Rectangle::perimeter() const {
   return m_perimeter;
 }
 
-std::string Rectangle::to_string() const {
+std::string Rectangle::toString() const {
   std::ostringstream out;
-  out << "Rectangle: " << m_a << " " << m_b;
+  out << "Rectangle " << m_a << " " << m_b;
 
   return out.str();
 }
