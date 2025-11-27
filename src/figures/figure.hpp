@@ -1,9 +1,7 @@
-#ifndef I_FIGURE_HPP
-#define I_FIGURE_HPP
+#ifndef FIGURE_HPP
+#define FIGURE_HPP
 
-#include <stdexcept>
-#include <cmath>
-#include <sstream>
+#include "../include_lib.hpp"
 
 class Figure {
 public:

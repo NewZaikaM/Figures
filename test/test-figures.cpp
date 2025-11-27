@@ -1,13 +1,14 @@
 #define _USE_MATH_DEFINES
 
 #include "catch2/catch_all.hpp"
+#include "../src/include_lib.hpp"
+#include "../src/factories/init_utils/init_utils.hpp"
+#include "../src/figures/figure.hpp"
 #include "../src/figures/triangle.hpp"
 #include "../src/figures/rectangle.hpp"
 #include "../src/figures/circle.hpp"
-#include "../src/factories/factory.hpp"
-#include <stdexcept>
-#include <cmath>
-#include <limits>
+#include "../src/factories/source_figure_factories/random_figure_factory.hpp"
+#include "../src/factories/source_figure_factories/stream_figure_factory.hpp"
 
 //Triangle
 TEST_CASE( "Triangle with negative sides", "[triangle][negative_sides]" ) {
@@ -134,24 +135,335 @@ TEST_CASE("Clone data", "[prototype][clone_data]") {
   REQUIRE( org_circle->perimeter() == copy_circle->perimeter());
   delete org_circle; 
   delete copy_circle;
-}  
+} 
 
-//Factory
-TEST_CASE( "Figure factory from empty string", "[factory][empty_string]" ) {
-  REQUIRE_THROWS_AS( FactoryFigure().create_from(""), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("    "), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("\n \n"), std::invalid_argument);
+//FigureFactory
+TEST_CASE( "TriangleFactory random", "[triangle][figure_factory][random]" ) {
+  RegistryFigure::initFactories();
+  const int N = 10000;
+  for (int i = 0; i < N; i++) {
+    Triangle* t = dynamic_cast<Triangle*>(
+      RegistryFigure::findFactory("Triangle")->createRand()
+    );
+    REQUIRE(t != nullptr);
+
+    REQUIRE(t->sideA() >= 1);
+    REQUIRE(t->sideA() <= 100);
+    REQUIRE(t->sideB() >= 1);
+    REQUIRE(t->sideB() <= 100);
+
+    double min_c = fabs(t->sideA() - t->sideB()) + 0.0001;
+    double max_c = t->sideA() + t->sideB() - 0.0001;
+
+    REQUIRE(t->sideC() >= min_c);
+    REQUIRE(t->sideC() <= max_c);
+
+    delete t;
+  }
 }
-TEST_CASE( "Figure factory from too few parameters", "[factory][few_param]" ) {
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Triangle 3 4 "), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Rectangle 3 "), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Circle "), std::invalid_argument);
+TEST_CASE( "RectangleFactory random", "[rectangle][figure_factory][random]" ) {
+  RegistryFigure::initFactories();
+  const int N = 10000;
+  for (int i = 0; i < N; i++) {
+    Rectangle* r = dynamic_cast<Rectangle*>(
+      RegistryFigure::findFactory("Rectangle")->createRand()
+    );
+    REQUIRE(r != nullptr);
+
+    REQUIRE(r->sideA() >= 1);
+    REQUIRE(r->sideA() <= 100);
+    REQUIRE(r->sideB() >= 1);
+    REQUIRE(r->sideB() <= 100);
+
+    delete r;
+  }
 }
-TEST_CASE( "Figure factory from non-numeric parameters", "[factory][non-num_param]" ) {
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Triangle 3 4 abc"), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Rectangle 3 abc"), std::invalid_argument);
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Circle abc"), std::invalid_argument);
+TEST_CASE( "CircleFactory random", "[circle][figure_factory][random]" ) {
+  RegistryFigure::initFactories();
+  const int N = 10000;
+  for (int i = 0; i < N; i++) {
+    Circle* c = dynamic_cast<Circle*>(
+      RegistryFigure::findFactory("Circle")->createRand()
+    );
+    REQUIRE(c != nullptr);
+
+    REQUIRE(c->radius() >= 1);
+    REQUIRE(c->radius() <= 100);
+
+    delete c;
+  }
 }
-TEST_CASE( "Figure factory from unknown name", "[factory][unknown_name]" ) {
-  REQUIRE_THROWS_AS( FactoryFigure().create_from("Test1 3 4 abc"), std::invalid_argument);
+TEST_CASE( "TriangleFactory sstream", "[triangle][figure_factory][sstream]" ) {
+  RegistryFigure::initFactories();
+
+  std::string triangleStr = "3 4 5";
+  std::stringstream ss(triangleStr);
+
+  Triangle* t = dynamic_cast<Triangle*>(
+    RegistryFigure::findFactory("Triangle")->createFrom(ss)
+  );
+
+  REQUIRE(t != nullptr);
+
+  REQUIRE(t->sideA() == 3);
+  REQUIRE(t->sideB() == 4);
+  REQUIRE(t->sideC() == 5);
+
+  REQUIRE(t->perimeter() == 12);
+
+  delete t;
 }
+TEST_CASE("TriangleFactory sstream errors", "[triangle][figure_factory][sstream]") {
+  RegistryFigure::initFactories();
+  {
+    std::stringstream ss("3 4");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Triangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("3 a 5");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Triangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("3 4 5 6");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Triangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+}
+TEST_CASE("RectangleFactory sstream", "[rectangle][figure_factory][sstream]") {
+  RegistryFigure::initFactories();
+
+  std::string rectStr = "5 10";
+  std::stringstream ss(rectStr);
+
+  Rectangle* r = dynamic_cast<Rectangle*>(
+    RegistryFigure::findFactory("Rectangle")->createFrom(ss)
+  );
+
+  REQUIRE(r != nullptr);
+
+  REQUIRE(r->sideA() == 5);
+  REQUIRE(r->sideB() == 10);
+  REQUIRE(r->perimeter() == 30);
+
+  delete r;
+}
+TEST_CASE("RectangleFactory sstream errors", "[rectangle][figure_factory][sstream]") {
+  RegistryFigure::initFactories();
+  {
+    std::stringstream ss("5");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Rectangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("5 x");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Rectangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("5 10 15");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Rectangle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+}
+TEST_CASE("CircleFactory sstream", "[circle][figure_factory][sstream]") {
+  RegistryFigure::initFactories();
+
+  std::string circleStr = "7";
+  std::stringstream ss(circleStr);
+
+  Circle* c = dynamic_cast<Circle*>(
+      RegistryFigure::findFactory("Circle")->createFrom(ss)
+  );
+
+  REQUIRE(c != nullptr);
+
+  REQUIRE(c->radius() == 7);
+  double expected = 2 * M_PI * 7;
+  REQUIRE(std::abs(c->perimeter() - expected) < 1e-6);
+
+  delete c;
+}
+TEST_CASE("CircleFactory sstream errors", "[circle][figure_factory][sstream]") {
+  RegistryFigure::initFactories();
+  {
+    std::stringstream ss("");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Circle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("r");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Circle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+  {
+    std::stringstream ss("5 6");
+    REQUIRE_THROWS_AS(
+      RegistryFigure::findFactory("Circle")->createFrom(ss),
+      std::invalid_argument
+    );
+  }
+}
+
+// RegistryFigure
+TEST_CASE("RegistryFigure initFactories", "[registry][init]") {
+  RegistryFigure::initFactories();
+
+  REQUIRE(RegistryFigure::figuresFactories.size() == 3);
+  REQUIRE(RegistryFigure::figuresFactories.find("Triangle") != RegistryFigure::figuresFactories.end());
+  REQUIRE(RegistryFigure::figuresFactories.find("Rectangle") != RegistryFigure::figuresFactories.end());
+  REQUIRE(RegistryFigure::figuresFactories.find("Circle") != RegistryFigure::figuresFactories.end());
+}
+TEST_CASE("RegistryFigure findFactory", "[registry][findFactory]") {
+  RegistryFigure::initFactories();
+
+  REQUIRE_NOTHROW(RegistryFigure::findFactory("Triangle"));
+  REQUIRE_NOTHROW(RegistryFigure::findFactory("Rectangle"));
+  REQUIRE_NOTHROW(RegistryFigure::findFactory("Circle"));
+
+  REQUIRE_THROWS_AS(RegistryFigure::findFactory("Hexagon"), std::invalid_argument);
+}
+
+// function randomFromTo
+TEST_CASE("randomFromTo produces values in range", "[random]") {
+  const double min = 5.0;
+  const double max = 10.0;
+  const int N = 1000;
+
+  for (int i = 0; i < N; ++i) {
+    double val = randomFromTo(min, max);
+    REQUIRE(val >= min);
+    REQUIRE(val <= max);
+  }
+}
+TEST_CASE("randomFromTo can produce min and max approximately", "[random]") {
+  const double min = 0.0;
+  const double max = 1.0;
+  bool hitMin = false;
+  bool hitMax = false;
+  const int N = 100000;
+
+  for (int i = 0; i < N; ++i) {
+    double val = randomFromTo(min, max);
+    if (val <= min + 1e-6) hitMin = true;
+    if (val >= max - 1e-6) hitMax = true;
+    if (hitMin && hitMax) break;
+  }
+
+  REQUIRE(hitMin);
+  REQUIRE(hitMax);
+}
+
+//SourceFigureFactory
+TEST_CASE("RandomFigureFactory basic functionality", "[random_factory][source_factory]") {
+  RegistryFigure::initFactories();
+
+  RandomFigureFactory rf;
+
+  bool gotTriangle = false;
+  bool gotRectangle = false;
+  bool gotCircle = false;
+
+  for (int i = 0; i < 200; ++i) {
+    Figure* f = rf.create();
+    REQUIRE(f != nullptr);
+
+    if (dynamic_cast<Triangle*>(f)) gotTriangle = true;
+    else if (dynamic_cast<Rectangle*>(f)) gotRectangle = true;
+    else if (dynamic_cast<Circle*>(f)) gotCircle = true;
+    else FAIL("Unknown figure type returned by RandomFigureFactory");
+
+    delete f;
+  }
+
+  REQUIRE(gotTriangle);
+  REQUIRE(gotRectangle);
+  REQUIRE(gotCircle);
+}
+TEST_CASE("RandomFigureFactory returns nullptr when no figures", "[random_factory][source_factory]") {
+  auto backup = RegistryFigure::figuresNames;
+
+  RegistryFigure::figuresNames.clear();
+
+  RandomFigureFactory rf;
+  Figure* result = rf.create();
+
+  REQUIRE(result == nullptr);
+
+  RegistryFigure::figuresNames = backup;
+}
+TEST_CASE("StreamFigureFactory create - triangle", "[stream_factory][source_factory]") {
+  RegistryFigure::initFactories();
+
+  std::stringstream input("Triangle 3 4 5\n");
+  StreamFigureFactory sff(input);
+
+  Figure* f = sff.create();
+  REQUIRE(f != nullptr);
+
+  Triangle* t = dynamic_cast<Triangle*>(f);
+  REQUIRE(t != nullptr);
+  REQUIRE(t->sideA() == 3);
+  REQUIRE(t->sideB() == 4);
+  REQUIRE(t->sideC() == 5);
+
+  delete f;
+}
+TEST_CASE("StreamFigureFactory create - skip invalid lines", "[stream_factory][source_factory]") {
+  RegistryFigure::initFactories();
+
+  std::stringstream input(
+    "bad line\n"
+    "Triangle 3 x 4\n"
+    "Rectangle 5 6\n"
+  );
+
+  StreamFigureFactory sff(input);
+
+  Figure* f = sff.create();
+  REQUIRE(f != nullptr);
+
+  Rectangle* r = dynamic_cast<Rectangle*>(f);
+  REQUIRE(r != nullptr);
+  REQUIRE(r->sideA() == 5);
+  REQUIRE(r->sideB() == 6);
+
+  delete f;
+}
+TEST_CASE("StreamFigureFactory create - no valid lines", "[stream_factory][source_factory]") {
+  RegistryFigure::initFactories();
+
+  std::stringstream input(
+    "bad\n"
+    "Triangle x y z\n"
+    "Circle 1 2\n"
+  );
+
+  StreamFigureFactory sff(input);
+
+  Figure* f = sff.create();
+  REQUIRE(f == nullptr);
+}
+
+
+
+
+
+
