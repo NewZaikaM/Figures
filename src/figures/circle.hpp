@@ -3,7 +3,7 @@
 
 #include "figure.hpp"
 
-class Circle : public Figure, public StringConvertible {
+class Circle : public Figure{
   const double m_r;
   const double m_perimeter;
   static double computePerimeter(double r);

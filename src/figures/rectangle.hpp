@@ -3,7 +3,7 @@
 
 #include "figure.hpp"
 
-class Rectangle : public Figure, public StringConvertible {
+class Rectangle : public Figure {
   const double m_a;
   const double m_b;
   const double m_perimeter;

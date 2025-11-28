@@ -3,17 +3,19 @@
 
 #include "../include_lib.hpp"
 
-class Figure {
+class StringConvertible {
+public:
+  virtual std::string toString() const = 0;
+  virtual ~StringConvertible() = default;
+};
+
+class Figure : public StringConvertible {
 public:
   virtual double perimeter() const = 0;
   virtual Figure* clone() const = 0;
   virtual ~Figure() = default;
 };
 
-class StringConvertible {
-public:
-  virtual std::string toString() const = 0;
-  virtual ~StringConvertible() = default;
-};
+
 
 #endif

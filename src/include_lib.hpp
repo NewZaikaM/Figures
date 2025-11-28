@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <sstream>
+#include <fstream>
 #include <cstdlib>
 #include <unordered_map>
 #include <vector>

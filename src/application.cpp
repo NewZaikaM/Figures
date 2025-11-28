@@ -1,8 +1,12 @@
-#include "include_lib.hpp"
-#include "factories/init_utils/init_utils.hpp"
+#include "app/app.hpp"
 
 int main() {
-  std::srand(std::time(nullptr));
-  RegistryFigure::initFactories();
+  try {
+    App app;
+    app.run();
+  }
+  catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << "\n";
+  }
   return 0;
 }
