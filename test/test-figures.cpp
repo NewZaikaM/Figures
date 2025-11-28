@@ -9,6 +9,7 @@
 #include "../src/figures/circle.hpp"
 #include "../src/factories/source_figure_factories/random_figure_factory.hpp"
 #include "../src/factories/source_figure_factories/stream_figure_factory.hpp"
+#include "../src/factories/abstract_factory/abstract_factory.hpp"
 
 //Triangle
 TEST_CASE( "Triangle with negative sides", "[triangle][negative_sides]" ) {
@@ -322,7 +323,7 @@ TEST_CASE("CircleFactory sstream errors", "[circle][figure_factory][sstream]") {
   }
 }
 
-// RegistryFigure
+//RegistryFigure
 TEST_CASE("RegistryFigure initFactories", "[registry][init]") {
   RegistryFigure::initFactories();
 
@@ -341,7 +342,7 @@ TEST_CASE("RegistryFigure findFactory", "[registry][findFactory]") {
   REQUIRE_THROWS_AS(RegistryFigure::findFactory("Hexagon"), std::invalid_argument);
 }
 
-// function randomFromTo
+//function randomFromTo
 TEST_CASE("randomFromTo produces values in range", "[random]") {
   const double min = 5.0;
   const double max = 10.0;
@@ -461,6 +462,32 @@ TEST_CASE("StreamFigureFactory create - no valid lines", "[stream_factory][sourc
   Figure* f = sff.create();
   REQUIRE(f == nullptr);
 }
+
+//AbstractFactory
+TEST_CASE("AbstractFactory creates correct factories", "[abstract_factory]") {
+    SourceFigureFactory* randomFactory = AbstractFactory::getFactory("Random");
+    REQUIRE(dynamic_cast<RandomFigureFactory*>(randomFactory) != nullptr);
+    delete randomFactory;
+
+    std::istringstream input("test data");
+    SourceFigureFactory* streamFactory = AbstractFactory::getFactory("Stream", &input);
+    REQUIRE(dynamic_cast<StreamFigureFactory*>(streamFactory) != nullptr);
+    delete streamFactory;
+}
+TEST_CASE("AbstractFactory throws exceptions", "[abstract_factory]") {
+    REQUIRE_THROWS_AS(AbstractFactory::getFactory("Stream"), std::invalid_argument);
+    REQUIRE_THROWS_AS(AbstractFactory::getFactory("UnknownType"), std::invalid_argument);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
