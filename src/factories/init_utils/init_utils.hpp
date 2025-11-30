@@ -6,7 +6,7 @@
 
 namespace RegistryFigure {
   extern std::vector<std::string> figuresNames;
-  extern std::unordered_map<std::string, std::unique_ptr<FigureFactory>> figuresFactories;
+  extern std::unordered_map<std::string,  FigureFactory*> figuresFactories;
 
   void initFactories();
   FigureFactory* findFactory(const std::string& name);

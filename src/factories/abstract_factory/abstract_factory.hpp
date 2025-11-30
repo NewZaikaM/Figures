@@ -5,7 +5,8 @@
 
 class AbstractFactory {
 public:
-static SourceFigureFactory* getFactory(const std::string& inputSource, std::istream* in = nullptr);
+static std::unique_ptr<SourceFigureFactory> getFactory(const std::string& inputSource);
+static std::unique_ptr<SourceFigureFactory> getFactory(const std::string& inputSource, std::istream& in);
 };
 
 #endif

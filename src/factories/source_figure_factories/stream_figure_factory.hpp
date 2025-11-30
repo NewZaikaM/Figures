@@ -6,10 +6,10 @@
 class StreamFigureFactory: public SourceFigureFactory {
 private:
   std::istream& m_stream;
-  Figure* createFrom(const std::string& representation) const;
+  std::unique_ptr<Figure> createFrom(const std::string& representation) const;
 public:
   StreamFigureFactory(std::istream& in);
-  Figure* create() const override;
+  std::unique_ptr<Figure> create() const override;
 };
 
 #endif

@@ -6,8 +6,8 @@
 
 class CircleFactory : public FigureFactory {
 public:
-  Figure* createRand() const override;
-  Figure* createFrom(std::stringstream& ss) const override;
+ std::unique_ptr<Figure> createRand() const override;
+ std::unique_ptr<Figure> createFrom(std::stringstream& ss) const override;
 };
 
 #endif

@@ -37,7 +37,7 @@ std::string Triangle::toString() const {
 
   return out.str();
 }
-Triangle* Triangle::clone() const {
+Triangle*  Triangle::clone() const {
   return new Triangle(*this);
 }
 

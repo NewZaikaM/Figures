@@ -143,9 +143,9 @@ TEST_CASE( "TriangleFactory random", "[triangle][figure_factory][random]" ) {
   RegistryFigure::initFactories();
   const int N = 10000;
   for (int i = 0; i < N; i++) {
-    Triangle* t = dynamic_cast<Triangle*>(
-      RegistryFigure::findFactory("Triangle")->createRand()
-    );
+    FigureFactory * factory = RegistryFigure::findFactory("Triangle");
+    std::unique_ptr<Figure> figure = factory->createRand();
+    Triangle* t = dynamic_cast<Triangle*>(figure.get());
     REQUIRE(t != nullptr);
 
     REQUIRE(t->sideA() >= 1);
@@ -158,40 +158,36 @@ TEST_CASE( "TriangleFactory random", "[triangle][figure_factory][random]" ) {
 
     REQUIRE(t->sideC() >= min_c);
     REQUIRE(t->sideC() <= max_c);
-
-    delete t;
   }
 }
 TEST_CASE( "RectangleFactory random", "[rectangle][figure_factory][random]" ) {
   RegistryFigure::initFactories();
   const int N = 10000;
   for (int i = 0; i < N; i++) {
-    Rectangle* r = dynamic_cast<Rectangle*>(
-      RegistryFigure::findFactory("Rectangle")->createRand()
-    );
+    
+    FigureFactory * factory = RegistryFigure::findFactory("Rectangle");
+    std::unique_ptr<Figure> figure = factory->createRand();
+    Rectangle* r = dynamic_cast<Rectangle*>(figure.get());
     REQUIRE(r != nullptr);
+
 
     REQUIRE(r->sideA() >= 1);
     REQUIRE(r->sideA() <= 100);
     REQUIRE(r->sideB() >= 1);
     REQUIRE(r->sideB() <= 100);
-
-    delete r;
   }
 }
 TEST_CASE( "CircleFactory random", "[circle][figure_factory][random]" ) {
   RegistryFigure::initFactories();
   const int N = 10000;
   for (int i = 0; i < N; i++) {
-    Circle* c = dynamic_cast<Circle*>(
-      RegistryFigure::findFactory("Circle")->createRand()
-    );
+    FigureFactory * factory = RegistryFigure::findFactory("Circle");
+    std::unique_ptr<Figure> figure = factory->createRand();
+    Circle* c = dynamic_cast<Circle*>(figure.get());
     REQUIRE(c != nullptr);
 
     REQUIRE(c->radius() >= 1);
     REQUIRE(c->radius() <= 100);
-
-    delete c;
   }
 }
 TEST_CASE( "TriangleFactory sstream", "[triangle][figure_factory][sstream]" ) {
@@ -200,10 +196,10 @@ TEST_CASE( "TriangleFactory sstream", "[triangle][figure_factory][sstream]" ) {
   std::string triangleStr = "3 4 5";
   std::stringstream ss(triangleStr);
 
-  Triangle* t = dynamic_cast<Triangle*>(
-    RegistryFigure::findFactory("Triangle")->createFrom(ss)
-  );
-
+  
+  FigureFactory * factory = RegistryFigure::findFactory("Triangle");
+  std::unique_ptr<Figure> figure = factory->createFrom(ss);
+  Triangle* t = dynamic_cast<Triangle*>(figure.get());
   REQUIRE(t != nullptr);
 
   REQUIRE(t->sideA() == 3);
@@ -211,8 +207,6 @@ TEST_CASE( "TriangleFactory sstream", "[triangle][figure_factory][sstream]" ) {
   REQUIRE(t->sideC() == 5);
 
   REQUIRE(t->perimeter() == 12);
-
-  delete t;
 }
 TEST_CASE("TriangleFactory sstream errors", "[triangle][figure_factory][sstream]") {
   RegistryFigure::initFactories();
@@ -244,17 +238,14 @@ TEST_CASE("RectangleFactory sstream", "[rectangle][figure_factory][sstream]") {
   std::string rectStr = "5 10";
   std::stringstream ss(rectStr);
 
-  Rectangle* r = dynamic_cast<Rectangle*>(
-    RegistryFigure::findFactory("Rectangle")->createFrom(ss)
-  );
-
+  FigureFactory * factory = RegistryFigure::findFactory("Rectangle");
+  std::unique_ptr<Figure> figure = factory->createFrom(ss);
+  Rectangle* r = dynamic_cast<Rectangle*>(figure.get());
   REQUIRE(r != nullptr);
 
   REQUIRE(r->sideA() == 5);
   REQUIRE(r->sideB() == 10);
   REQUIRE(r->perimeter() == 30);
-
-  delete r;
 }
 TEST_CASE("RectangleFactory sstream errors", "[rectangle][figure_factory][sstream]") {
   RegistryFigure::initFactories();
@@ -286,17 +277,14 @@ TEST_CASE("CircleFactory sstream", "[circle][figure_factory][sstream]") {
   std::string circleStr = "7";
   std::stringstream ss(circleStr);
 
-  Circle* c = dynamic_cast<Circle*>(
-      RegistryFigure::findFactory("Circle")->createFrom(ss)
-  );
-
+  FigureFactory * factory = RegistryFigure::findFactory("Circle");
+  std::unique_ptr<Figure> figure = factory->createFrom(ss);
+  Circle* c = dynamic_cast<Circle*>(figure.get());
   REQUIRE(c != nullptr);
 
   REQUIRE(c->radius() == 7);
   double expected = 2 * M_PI * 7;
   REQUIRE(std::abs(c->perimeter() - expected) < 1e-6);
-
-  delete c;
 }
 TEST_CASE("CircleFactory sstream errors", "[circle][figure_factory][sstream]") {
   RegistryFigure::initFactories();
@@ -383,15 +371,13 @@ TEST_CASE("RandomFigureFactory basic functionality", "[random_factory][source_fa
   bool gotCircle = false;
 
   for (int i = 0; i < 200; ++i) {
-    Figure* f = rf.create();
+    std::unique_ptr<Figure> f = rf.create();
     REQUIRE(f != nullptr);
 
-    if (dynamic_cast<Triangle*>(f)) gotTriangle = true;
-    else if (dynamic_cast<Rectangle*>(f)) gotRectangle = true;
-    else if (dynamic_cast<Circle*>(f)) gotCircle = true;
+    if (dynamic_cast<Triangle*>(f.get())) gotTriangle = true;
+    else if (dynamic_cast<Rectangle*>(f.get())) gotRectangle = true;
+    else if (dynamic_cast<Circle*>(f.get())) gotCircle = true;
     else FAIL("Unknown figure type returned by RandomFigureFactory");
-
-    delete f;
   }
 
   REQUIRE(gotTriangle);
@@ -404,9 +390,9 @@ TEST_CASE("RandomFigureFactory returns nullptr when no figures", "[random_factor
   RegistryFigure::figuresNames.clear();
 
   RandomFigureFactory rf;
-  Figure* result = rf.create();
+  std::unique_ptr<Figure> result = rf.create();
 
-  REQUIRE(result == nullptr);
+  REQUIRE(!result);
 
   RegistryFigure::figuresNames = backup;
 }
@@ -416,16 +402,14 @@ TEST_CASE("StreamFigureFactory create - triangle", "[stream_factory][source_fact
   std::stringstream input("Triangle 3 4 5\n");
   StreamFigureFactory sff(input);
 
-  Figure* f = sff.create();
-  REQUIRE(f != nullptr);
+  std::unique_ptr<Figure> f = sff.create();
+  REQUIRE(f);
 
-  Triangle* t = dynamic_cast<Triangle*>(f);
+  Triangle* t = dynamic_cast<Triangle*>(f.get());
   REQUIRE(t != nullptr);
   REQUIRE(t->sideA() == 3);
   REQUIRE(t->sideB() == 4);
   REQUIRE(t->sideC() == 5);
-
-  delete f;
 }
 TEST_CASE("StreamFigureFactory create - skip invalid lines", "[stream_factory][source_factory]") {
   RegistryFigure::initFactories();
@@ -438,15 +422,13 @@ TEST_CASE("StreamFigureFactory create - skip invalid lines", "[stream_factory][s
 
   StreamFigureFactory sff(input);
 
-  Figure* f = sff.create();
-  REQUIRE(f != nullptr);
+  std::unique_ptr<Figure> f = sff.create();
+  REQUIRE(f);
 
-  Rectangle* r = dynamic_cast<Rectangle*>(f);
+  Rectangle* r = dynamic_cast<Rectangle*>(f.get());
   REQUIRE(r != nullptr);
   REQUIRE(r->sideA() == 5);
   REQUIRE(r->sideB() == 6);
-
-  delete f;
 }
 TEST_CASE("StreamFigureFactory create - no valid lines", "[stream_factory][source_factory]") {
   RegistryFigure::initFactories();
@@ -459,26 +441,23 @@ TEST_CASE("StreamFigureFactory create - no valid lines", "[stream_factory][sourc
 
   StreamFigureFactory sff(input);
 
-  Figure* f = sff.create();
-  REQUIRE(f == nullptr);
+  std::unique_ptr<Figure> f = sff.create();
+  REQUIRE(!f);
 }
 
 //AbstractFactory
 TEST_CASE("AbstractFactory creates correct factories", "[abstract_factory]") {
-    SourceFigureFactory* randomFactory = AbstractFactory::getFactory("Random");
-    REQUIRE(dynamic_cast<RandomFigureFactory*>(randomFactory) != nullptr);
-    delete randomFactory;
+    std::unique_ptr<SourceFigureFactory> randomFactory = AbstractFactory::getFactory("Random");
+    REQUIRE(dynamic_cast<RandomFigureFactory*>(randomFactory.get()) != nullptr);
 
     std::istringstream input("test data");
-    SourceFigureFactory* streamFactory = AbstractFactory::getFactory("Stream", &input);
-    REQUIRE(dynamic_cast<StreamFigureFactory*>(streamFactory) != nullptr);
-    delete streamFactory;
+    std::unique_ptr<SourceFigureFactory> streamFactory = AbstractFactory::getFactory("Stream", input);
+    REQUIRE(dynamic_cast<StreamFigureFactory*>(streamFactory.get()) != nullptr);
 }
 TEST_CASE("AbstractFactory throws exceptions", "[abstract_factory]") {
     REQUIRE_THROWS_AS(AbstractFactory::getFactory("Stream"), std::invalid_argument);
     REQUIRE_THROWS_AS(AbstractFactory::getFactory("UnknownType"), std::invalid_argument);
 }
-
 
 
 

@@ -2,7 +2,7 @@
 #include "../init_utils/init_utils.hpp"
 #include "../../figures/triangle.hpp"
 
-Figure* TriangleFactory::createRand() const {
+std::unique_ptr<Figure> TriangleFactory::createRand() const {
   double a = randomFromTo(1, 100);
   double b = randomFromTo(1, 100);
   double epsilon = 0.0001;
@@ -15,10 +15,10 @@ Figure* TriangleFactory::createRand() const {
   
   double c = randomFromTo(min_c, max_c);
 
-  return new Triangle(a, b, c);
+  return std::make_unique<Triangle>(a, b, c);
 }
 
-Figure* TriangleFactory::createFrom(std::stringstream& ss) const {
+std::unique_ptr<Figure> TriangleFactory::createFrom(std::stringstream& ss) const {
   double a, b, c;
   if (!(ss >> a)) {
     if (ss.eof())
@@ -44,5 +44,5 @@ Figure* TriangleFactory::createFrom(std::stringstream& ss) const {
   if (ss >> std::ws && !ss.eof())
     throw std::invalid_argument("Too many parameters for triangle");
 
-  return new Triangle(a, b, c);
+  return std::make_unique<Triangle>(a, b, c);
 }

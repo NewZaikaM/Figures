@@ -5,11 +5,11 @@
 #include "../factories/source_figure_factories/source_figure_factory.hpp"
 
 class App {
-  SourceFigureFactory* factory = nullptr;
-  std::vector<Figure*> figures;
+  std::unique_ptr<SourceFigureFactory> factory = nullptr;
+  std::vector<std::unique_ptr<Figure>> figures;
+  std::unique_ptr<std::ifstream> fileStream;
 public:
   App() = default;
-  ~App();
 
   void run();
 private:

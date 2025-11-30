@@ -2,11 +2,11 @@
 #include "../init_utils/init_utils.hpp"
 #include "../../figures/rectangle.hpp"
 
-Figure* RectangleFactory::createRand() const {
-  return new Rectangle(randomFromTo(1, 100), randomFromTo(1, 100));
+std::unique_ptr<Figure> RectangleFactory::createRand() const {
+  return std::make_unique<Rectangle>(randomFromTo(1, 100), randomFromTo(1, 100));
 }
 
-Figure* RectangleFactory::createFrom(std::stringstream& ss) const {
+std::unique_ptr<Figure> RectangleFactory::createFrom(std::stringstream& ss) const {
   double a, b;
   
   if (!(ss >> a)) {
@@ -26,5 +26,5 @@ Figure* RectangleFactory::createFrom(std::stringstream& ss) const {
   if (ss >> std::ws && !ss.eof())
     throw std::invalid_argument("Too many parameters for rectangle");
   
-  return new Rectangle(a, b);
+  return std::make_unique<Rectangle>(a, b);
 }

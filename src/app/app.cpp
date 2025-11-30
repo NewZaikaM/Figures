@@ -1,14 +1,6 @@
 #include "app.hpp"
 #include "../factories/abstract_factory/abstract_factory.hpp"
 
-App::~App() {
-  delete factory;
-
-  for (Figure* f : figures) {
-      delete f;
-  }
-}
-
 void App::run() {
   std::srand(std::time(nullptr));
   RegistryFigure::initFactories();
@@ -31,19 +23,19 @@ void App::readInputSource() {
   std::cin >> source;
 
   if (source == "Stream") {
-    factory = AbstractFactory::getFactory(source, &std::cin);
+    factory = AbstractFactory::getFactory(source, std::cin);
   } else if (source == "File") {
     std::string filename;
     std::cout << "Enter filename: ";
     std::cin >> filename;
 
-    std::ifstream* fin = new std::ifstream(filename);
-    if (!fin->is_open()) {
-      delete fin;
+    fileStream = std::make_unique<std::ifstream>(filename);
+
+    if (!fileStream->is_open()) {
       throw std::runtime_error("Cannot open file: " + filename);
     }
 
-    factory = AbstractFactory::getFactory("Stream", fin);
+    factory = AbstractFactory::getFactory("Stream", *fileStream);
   } else if (source == "Random") {
     factory = AbstractFactory::getFactory(source);
   }
@@ -61,27 +53,26 @@ void App::readFigures() {
     figures.reserve(N);
 
     for (int i = 0; i < N; ++i) {
-      Figure* fig = factory->create();
-      if (!fig) {
+      std::unique_ptr<Figure> figure = factory->create();
+      if (!figure) {
         std::cerr << "Failed to read figure #" << (i + 1) << "\n";
         continue;
       }
-      figures.push_back(fig);
+      figures.push_back(std::move(figure));
     }
 }
 
 void App::printFigures(std::ostream& out) const {
-  for (Figure* f : figures) {
-    out << f->toString() << "\n";
+  for (const auto& figure : figures) {
+    out << figure->toString() << "\n";
   }
 }
 
 void App::cloneFigures() const {
-  for (Figure* f : figures) {
-    Figure* clone = f->clone();
+  for (const std::unique_ptr<Figure>& figure : figures) {
+    std::unique_ptr<Figure> clone(figure->clone());
     if (clone) {
-    std::cout << clone->toString() << "\n";
-    delete clone;
+      std::cout << clone->toString() << "\n";
     }
   }
 }

@@ -2,11 +2,11 @@
 #include "../init_utils/init_utils.hpp"
 #include "../../figures/circle.hpp"
 
-Figure* CircleFactory::createRand() const {
-  return new Circle(randomFromTo(1, 100));
+std::unique_ptr<Figure> CircleFactory::createRand() const {
+  return std::make_unique<Circle>(randomFromTo(1, 100));
 }
 
-Figure* CircleFactory::createFrom(std::stringstream& ss) const {
+std::unique_ptr<Figure> CircleFactory::createFrom(std::stringstream& ss) const {
   double r;
 
   if (!(ss >> r)) {
@@ -19,5 +19,5 @@ Figure* CircleFactory::createFrom(std::stringstream& ss) const {
   if (ss >> std::ws && !ss.eof())
     throw std::invalid_argument("Too many parameters for circle");
   
-  return new Circle(r);
+  return std::make_unique<Circle>(r);
 }

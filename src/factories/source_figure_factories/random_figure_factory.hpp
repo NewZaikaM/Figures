@@ -5,7 +5,7 @@
 
 class RandomFigureFactory: public SourceFigureFactory {
 public:
-    Figure* create() const override;
+    std::unique_ptr<Figure> create() const override;
 };
 
 #endif

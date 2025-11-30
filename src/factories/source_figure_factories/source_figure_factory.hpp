@@ -6,7 +6,7 @@
 
 class SourceFigureFactory {
 public:
-  virtual Figure* create() const = 0;
+  virtual std::unique_ptr<Figure> create() const = 0;
   virtual ~SourceFigureFactory() = default;
 };
 
